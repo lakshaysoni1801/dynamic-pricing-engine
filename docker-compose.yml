@@ -1,0 +1,11 @@
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment:
+      PE_REGISTRY_DIR: /app/artifacts/registry
+    volumes:
+      - registry:/app/artifacts/registry
+
+volumes:
+  registry:

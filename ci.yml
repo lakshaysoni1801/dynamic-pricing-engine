@@ -1,0 +1,31 @@
+name: ci
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev]"
+      - name: Lint
+        run: ruff check src eval tests
+      - name: Unit tests
+        run: pytest -q
+      - name: Smoke eval (small config)
+        env:
+          PE_N_SAMPLES: "6000"
+          PE_N_ESTIMATORS: "120"
+        run: python eval/run_eval.py --no-register

@@ -1,0 +1,52 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pricing-engine"
+version = "0.1.0"
+description = "Dynamic pricing and revenue optimization: an XGBoost demand model plus a profit-maximizing optimizer, a model registry, and a FastAPI serving layer."
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+dependencies = [
+    "xgboost>=2.0",
+    "scikit-learn>=1.3",
+    "numpy>=1.24",
+    "joblib>=1.3",
+    "fastapi>=0.110",
+    "uvicorn[standard]>=0.29",
+    "pydantic>=2.6",
+    "filelock>=3.13",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.4", "ruff>=0.4", "matplotlib>=3.7", "httpx>=0.27"]
+
+[project.scripts]
+pricing-engine = "pricing_engine.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+# Pinned explicitly (rather than relying on ruff's evolving default set) so that a
+# future ruff release which stabilizes new default-on checks (e.g. RUF0xx, UPxxx) can't
+# silently start failing CI on unrelated code. E = pycodestyle errors (includes E402),
+# F = pyflakes, I = isort import ordering.
+select = ["E", "F", "I"]
+
+[tool.ruff.lint.per-file-ignores]
+# tests/ and eval/ manipulate sys.path before importing the local package, which is
+# necessarily an import-not-at-top-of-file (E402).
+"tests/*" = ["E402"]
+"eval/*" = ["E402"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+testpaths = ["tests"]
+filterwarnings = ["ignore::DeprecationWarning"]
